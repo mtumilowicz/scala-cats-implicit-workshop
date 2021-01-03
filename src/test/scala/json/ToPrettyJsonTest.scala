@@ -20,11 +20,11 @@ class ToPrettyJsonTest extends org.scalatest.FunSuite {
   test("companion object method: person toPrettyJson") {
     //    given
     val address = Address(street = "Tamka 4", city = "Warsaw")
-    val person = Person(name = "Buck Mulligun", address = address)
+    val person = Person(name = "Buck Milligun", address = address)
 
     //    expect
     ToPrettyJson.prettyJson(person) shouldBe s"""{
-                                      | "name": "Buck Mulligun",
+                                      | "name": "Buck Milligun",
                                       | "address": {
                                       |  "street": "Tamka 4",
                                       |  "city": "Warsaw"
@@ -46,11 +46,11 @@ class ToPrettyJsonTest extends org.scalatest.FunSuite {
   test("extension method: person toPrettyJson") {
     //    given
     val address = Address(street = "Tamka 4", city = "Warsaw")
-    val person = Person(name = "Buck Mulligun", address = address)
+    val person = Person(name = "Buck Milligun", address = address)
 
     //    expect
     person.toPrettyJson() shouldBe s"""{
-                                      | "name": "Buck Mulligun",
+                                      | "name": "Buck Milligun",
                                       | "address": {
                                       |  "street": "Tamka 4",
                                       |  "city": "Warsaw"
