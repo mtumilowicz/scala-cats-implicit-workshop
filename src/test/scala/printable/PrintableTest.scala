@@ -1,6 +1,5 @@
 package printable
 
-import json.ToPrettyJson
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import printable.PrintableInstances._
 import printable.PrintableSyntax._
