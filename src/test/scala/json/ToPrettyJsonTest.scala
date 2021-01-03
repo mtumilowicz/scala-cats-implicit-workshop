@@ -6,7 +6,33 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class ToPrettyJsonTest extends org.scalatest.FunSuite {
 
-  test("address toPrettyJson") {
+  test("companion object method: address toPrettyJson") {
+    //    given
+    val address = Address(street = "Tamka 4", city = "Warsaw")
+
+    //    expect
+    ToPrettyJson.prettyJson(address) shouldBe s"""{
+                                       | "street": "Tamka 4",
+                                       | "city": "Warsaw"
+                                       |}""".stripMargin
+  }
+
+  test("companion object method: person toPrettyJson") {
+    //    given
+    val address = Address(street = "Tamka 4", city = "Warsaw")
+    val person = Person(name = "Buck Mulligun", address = address)
+
+    //    expect
+    ToPrettyJson.prettyJson(person) shouldBe s"""{
+                                      | "name": "Buck Mulligun",
+                                      | "address": {
+                                      |  "street": "Tamka 4",
+                                      |  "city": "Warsaw"
+                                      | }
+                                      |}""".stripMargin
+  }
+
+  test("extension method: address toPrettyJson") {
     //    given
     val address = Address(street = "Tamka 4", city = "Warsaw")
 
@@ -17,7 +43,7 @@ class ToPrettyJsonTest extends org.scalatest.FunSuite {
                                        |}""".stripMargin
   }
 
-  test("person toPrettyJson") {
+  test("extension method: person toPrettyJson") {
     //    given
     val address = Address(street = "Tamka 4", city = "Warsaw")
     val person = Person(name = "Buck Mulligun", address = address)
