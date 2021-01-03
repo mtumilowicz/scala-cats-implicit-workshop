@@ -1,8 +1,10 @@
 package printable
 
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import printable.PrintableInstances._
-import printable.PrintableSyntax._
+import PrintableInstances._
+import PrintableSyntax._
+import WithCatsInstances._
+import cats.implicits._
 
 import java.io.ByteArrayOutputStream
 
@@ -14,6 +16,14 @@ class PrintableTest extends org.scalatest.FunSuite {
 
     //    expect
     person.format shouldBe "Buck Milligun is a 33 year-old"
+  }
+
+  test("extension method: show") {
+    //    given
+    val person = Person(name = "Buck Milligun", age = 33)
+
+    //    expect
+    person.show shouldBe "Buck Milligun is a 33 year-old"
   }
 
   test("extension method: print") {
