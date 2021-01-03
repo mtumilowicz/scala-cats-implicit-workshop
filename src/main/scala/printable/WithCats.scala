@@ -1,5 +1,8 @@
+package printable
+
 import cats._
 import cats.implicits._
+import printable.Cat
 
 object WithCats extends App {
 

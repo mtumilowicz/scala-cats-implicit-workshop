@@ -1,3 +1,5 @@
+package evidence
+
 import cats.Monoid
 import cats.implicits.catsSyntaxSemigroup
 

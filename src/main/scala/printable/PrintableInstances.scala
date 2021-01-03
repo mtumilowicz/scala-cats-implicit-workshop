@@ -1,3 +1,5 @@
+package printable
+
 object PrintableInstances {
   implicit val printableString: Printable[String] = (a: String) => a
 
