@@ -3,8 +3,8 @@ package json
 import json.PersonOps._
 
 object Intro extends App {
-  val a = Address("1 Scala Lane", "Anytown")
-  val p = Person("Buck Trends", a)
+  val a = Address(street = "1 Scala Lane", city = "Anytown")
+  val p = Person(name = "Buck Trends", a)
   println(a.toJSON())
   println()
   println(p.toJSON())

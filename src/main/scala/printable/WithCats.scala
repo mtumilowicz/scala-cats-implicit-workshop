@@ -2,14 +2,14 @@ package printable
 
 import cats._
 import cats.implicits._
-import printable.Cat
+import printable.Person
 
 object WithCats extends App {
 
-  implicit val catShow: Show[Cat] =
-    Show.show(cat => s"${cat.name} is a ${cat.age} year-old ${cat.color} cat")
+  implicit val catShow: Show[Person] =
+    Show.show(cat => s"${cat.name} is a ${cat.age} year-old")
 
-  val cat = Cat("A", 1, "B")
+  val cat = Person(name = "A", age = 1)
 
   cat.show
 
