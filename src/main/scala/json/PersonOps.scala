@@ -2,18 +2,18 @@ package json
 
 object PersonOps {
 
-  implicit class PersonToJSON(person: Person) extends ToJSON {
-    def toJSON(level: Int = 0): String = {
+  implicit class PersonToPrettyJson(person: Person) extends ToPrettyJson {
+    def prettyJson(level: Int = 0): String = {
       val (outdent, indent) = indentation(level)
       s"""{
          |${indent}"name": "${person.name}",
-         |${indent}"address": ${person.address.toJSON(level + 1)}
+         |${indent}"address": ${person.address.prettyJson(level + 1)}
          |$outdent}""".stripMargin
     }
   }
 
-  implicit class AddressToJSON(address: Address) extends ToJSON {
-    def toJSON(level: Int = 0): String = {
+  implicit class AddressToPrettyJson(address: Address) extends ToPrettyJson {
+    def prettyJson(level: Int = 0): String = {
       val (outdent, indent) = indentation(level)
       s"""{
          |${indent}"street": "${address.street}",
