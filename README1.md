@@ -1,6 +1,7 @@
 # scala-cats-implicit-workshop
 * references
     * [Programming Scala, 2nd Edition - Dean Wampler](https://www.oreilly.com/library/view/programming-scala-2nd/9781491950135/)
+    * [Scala with Cats Book - Noel Welsh](https://underscore.io/books/scala-with-cats/)
     * https://blog.knoldus.com/sorting-in-scala-using-sortedsortby-and-sortwith-function/
     
 ## preface
