@@ -141,7 +141,20 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     * constraints reducing bugs
         * example: limit the allowed types that can be used with certain methods with parameterized types
 
+## cats
+
+
 ## type classes
+* is an interface or API that represents some functionality we want to implement
+* in Cats a type class is represented by a trait with at least one type parameter
+    ```
+    trait JsonWriter[A] {
+        def write(value: A): Json
+    }
+    ```
+* instances of a type class provide implementations for the types
+    * we define instances by creating concrete implementations of the type class and tagging 
+      them with the implicit keyword
 * note that Java’s default toString is of little value, because it just shows the type
   name and its address in the JVM’s heap
   
