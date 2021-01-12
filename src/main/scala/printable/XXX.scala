@@ -1,5 +1,0 @@
-package printable
-
-object XXX {
-
-}
