@@ -8,29 +8,29 @@
 
 ## introduction
 * implicits are a powerful, if controversial feature in Scala
-    * because they are "nonlocal" in the source code
-        * when reading the source code, it’s not obvious when an implicit
-          value or method is being used, which can be confusing to the reader
-* some are imported automatically through Predef
+    * they are "nonlocal" in the source code - it’s not obvious when an implicit value or method 
+      is being used, which can be confusing to the reader
+* some are imported automatically through `Predef`
 * used to 
     * reduce boilerplate
     * simulate adding new methods to existing types
     * support the creation of domain-specific languages (DSLs)
+    
 ## arguments
 ```
 def method(arg1: Type1)(implicit context: Type2) = ...
 
-implicit val defaultContext: Type2 = ...
-val value = method(...) // implicit value in the local scope will be used as a context
+def anotherMethod() {
+    implicit val defaultContext: Type2 = ...
+    val value = method(...) // implicit value in the local scope will be used as a context
+}
 ```
-* label method arguments that the user does not have to provide explicitly
-    * when an implicit argument is omitted, a type-compatible value will be used 
+* user does not have to provide argument explicitly
+    * when an implicit argument is omitted, a type-compatible `implicit` value will be used 
       from the enclosing scope, if available
-    * otherwise, a compiler error occurs
-* rules
-    1. only the last argument can be implicit
-    1. list can’t have "nonimplicit" arguments followed by implicit arguments
-    1. all the arguments are implicit when the list starts with the implicit keyword
+    * otherwise, a compiler error occurs 
+    * only the last argument can be implicit
+    
 ## methods
 ```
 case class Data(...)
@@ -39,20 +39,25 @@ object DataOps {
     implicit def op(implicit data: Data): Type2 = ...
 }
 
-import DataOps.op
-implicit val data = Data(...)
-
-def method(arg1: Type1)(implicit context: Type2) = ...
-
-val value = method(...)
+class SomeClass {
+    import DataOps.op
+    implicit val data = Data(...)
+    
+    def method(arg1: Type1)(implicit context: Type2) = ...
+    
+    def anotherMethod() {
+        val value = method(...)
+    }
+}
 
 ```
-* function as an implicit value, it must not take arguments itself, unless the arguments are also implicit
+* implicit function takes only implicit arguments
+
+## classes
 
 ## implicitly
-* Predef defines a method called implicitly
-* provides way of defining method signatures that take a single implicit argument, where that argument 
-  is a parameterized type
+* `Predef` defines a method called implicitly
+* syntactic sugar fo defining implicit parameterized argument
     ```
     def sortBy[B](f: A => B)(implicit ord: Ordering[B]): List[A] = // idiom is so common that Scala provides a shorthand syntax
         list.sortBy(f)(ord)
@@ -61,9 +66,6 @@ val value = method(...)
     ```
     def sortBy[B : Ordering](f: A => B): List[A] = // type parameter B : Ordering is called a context bound
         list.sortBy(f)(implicitly[Ordering[B]]) // [B : Ordering] for an implicit Ordering[B] parameter
-  
-    empList.sortBy(_.salary)(Ordering[Double].reverse)
-    empList.sortBy(_.salary)
     ```
 
 ## scenarios
