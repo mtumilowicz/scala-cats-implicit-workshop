@@ -1,0 +1,5 @@
+package printable
+
+object XXX {
+
+}

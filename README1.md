@@ -3,6 +3,7 @@
     * [Programming Scala, 2nd Edition - Dean Wampler](https://www.oreilly.com/library/view/programming-scala-2nd/9781491950135/)
     * [Scala with Cats Book - Noel Welsh](https://underscore.io/books/scala-with-cats/)
     * https://blog.knoldus.com/sorting-in-scala-using-sortedsortby-and-sortwith-function/
+    * https://stackoverflow.com/questions/36432376/implicit-class-vs-implicit-conversion-to-trait
     
 ## preface
 
@@ -11,6 +12,7 @@
     * they are "nonlocal" in the source code - it’s not obvious when an implicit value or method 
       is being used, which can be confusing to the reader
 * some are imported automatically through `Predef`
+    * most of those are used to convert from one type to another
 * used to 
     * reduce boilerplate
     * simulate adding new methods to existing types
@@ -54,6 +56,37 @@ class SomeClass {
 * implicit function takes only implicit arguments
 
 ## classes
+```
+implicit class RichInt(n: Int) extends Ordered[Int] {
+   def min(m: Int): Int = if (n <= m) n else m
+   ...
+}
+```
+will desugar into:
+```
+class RichInt(n: Int) extends Ordered[Int] {
+  def min(m: Int): Int = if (n <= m) n else m
+  ...
+}
+implicit final def RichInt(n: Int): RichInt = new RichInt(n)
+```
+* implicit classes came into being to ease the creation of classes which provide extension methods to another type
+* conversions context
+    * implicit methods aren’t chained to get from the available type, through intermediate types, to the target type
+        * only a method that takes a single available type instance and returns a target type instance will be considered
+* example
+    ```
+    implicit final class ArrowAssoc[A](val self: A) {
+        def -> [B](y: B): Tuple2[A, B] = Tuple2(self, y)
+    }
+    ```
+    * when we call `"a" -> 1`compiler goes through the following logical steps:
+        1. sees a call `->` method on `String`
+        2. String has no `->` method
+           * looks for an implicit conversion in scope to a type that has this method
+        3. finds `ArrowAssoc`
+        4. constructs an `ArrowAssoc` with `"a"`
+        5. resolves the `-> 1` part of the expression
 
 ## implicitly
 * `Predef` defines a method called implicitly
@@ -108,43 +141,10 @@ class SomeClass {
     * constraints reducing bugs
         * example: limit the allowed types that can be used with certain methods with parameterized types
 
-## conversions
-```
-implicit final class ArrowAssoc[A](val self: A) {
-    def -> [B](y: B): Tuple2[A, B] = Tuple2(self, y)
-}
-```
-1. No conversion will be attempted if the object and method combination type check
-   successfully.
-2. Only classes and methods with the implicit keyword are considered.
-3. Only implicit classes and methods in the current scope are considered, as well as
-   implicit methods defined in the companion object of the target type (see the fol‐
-   lowing discussion).
-4. Implicit methods aren’t chained to get from the available type, through intermediate
-   types, to the target type. Only a method that takes a single available type instance
-   and returns a target type instance will be considered.
-5. No conversion is attempted if more than one possible conversion method could be
-   applied. There must be one and only one, unambiguous possibility.
-
-* Because ArrowAssoc is
-  declared implicit, the compiler goes through the following logical steps:
-1. It sees that we’re trying to call a -> method on String (e.g., "one" -> 1 ).
-2. Because String has no -> method, it looks for an implicit conversion in scope to a
-   type that has this method.
-3. It finds ArrowAssoc .
-4. It constructs an ArrowAssoc , passing it the "one" string.
-5. It then resolves the -> 1 part of the expression and confirms the whole expression’s
-   type matches the expectation of Map.apply , which is a pair instance.
-   
 ## type classes
-* Note that Java’s default toString is of little value, because it just shows the type
+* note that Java’s default toString is of little value, because it just shows the type
   name and its address in the JVM’s heap
   
 ## performance
-* a project that uses implicits heavily is a project that is slow to build
-* Implicit conversions also incur extra runtime overhead, due to the extra layers of indi‐
-  rection from the wrapper types
-  
-## Built-in Implicits
-* Most of them are methods, and most of those are used to convert from one
-  type to another
+* compile-time overhead: project is slow to build
+* runtime overhead: due to the extra layers of indirection from the wrapper types
