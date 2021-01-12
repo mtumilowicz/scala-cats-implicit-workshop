@@ -59,59 +59,54 @@ class SomeClass {
 * `Predef` defines a method called implicitly
 * syntactic sugar fo defining implicit parameterized argument
     ```
-    def sortBy[B](f: A => B)(implicit ord: Ordering[B]): List[A] = // idiom is so common that Scala provides a shorthand syntax
+    // idiom is so common that Scala provides a shorthand syntax
+    def sortBy[B](f: A => B)(implicit ord: Ordering[B]): List[A] =
         list.sortBy(f)(ord)
     ```
     is equivalent to      
     ```
-    def sortBy[B : Ordering](f: A => B): List[A] = // type parameter B : Ordering is called a context bound
-        list.sortBy(f)(implicitly[Ordering[B]]) // [B : Ordering] for an implicit Ordering[B] parameter
+    def sortBy[B : Ordering](f: A => B): List[A] = // 'B : Ordering' is called a context bound
+        list.sortBy(f)(implicitly[Ordering[B]]) // way of obtaining implicit parameter parameter
     ```
 
-## scenarios
-* several common idioms implemented with implicit arguments whose benefits fall into two broad categories
-    * boilerplate elimination
-        * example: providing context information implicitly rather than explicitly
-            * transactions, database connections, thread pools, and user sessions
+## case study
+* common idioms
+    * boilerplate elimination: providing context information implicitly rather than explicitly
         * example: `apply[T](body: => T)(implicit executor: ExecutionContext): Future[T]`
-    * constraints that reduce bugs
+        * also: transactions, database connections, thread pools, and user sessions
+    * implicit evidence
+        * constrains the allowed types, but doesn’t require them to conform to a common supertype
+        * example
+            ```
+            trait TraversableOnce[+A] ... {
+                ...
+                def toMap[T, U](implicit ev: <:<[A, (T, U)]): immutable.Map[T, U]
+                ...
+            }
+            ```
+            * `<:<(A, (T, U))` equivalent to `A <:< (T, U)`
+            * `A <:< B` means A must be a subtype of B
+            * we only used existence of implicit as confirmation that we operate on a sequence of pairs
+                * no sense in calling `toMap` if the sequence is not a sequence of pairs
         * example: limit the allowed types that can be used with certain methods with parameterized types
-        * example: argument might contain authorization tokens that
-          control whether or not certain API operations can be invoked on behalf of the user or
-          to limit data visibility
-        * example: implicit evidence
-            * constrains the allowed types, but doesn’t require them to conform to a common supertype
-            * `def toMap[T, U](implicit ev: <:<[A, (T, U)]): immutable.Map[T, U]`
-                * `<:<(A, (T, U))` equivalent to `A <:< (T, U)`
-            * we didn’t use the implicit object in the computation we only used its existence as 
-              confirmation that certain type constraints were satisfied
-        * example: working around limitations due to type erasure
-            ```
-            object M { // compile time error - type erasure
-                def m(seq: Seq[Int]): Unit = ...
-                def m(seq: Seq[String]): Unit = ...
-            }
-          
-            object M { // OK
-                implicit object IntMarker
-                implicit object StringMarker
-            
-                def m(seq: Seq[Int])(implicit i: IntMarker.type): Unit = ...
-          
-                def m(seq: Seq[String])(implicit s: StringMarker.type): Unit = ...
-            }
-            ```
-            * Avoid using implicit arguments and corresponding values of com‐
-              mon types like Int and String
-            * It’s more likely that implicits of such
-              types will be defined in multiple places and cause confusing bugs or
-              compilation errors when they are imported into the same scope.
-            * With custom types, you can provide helpful error messages for your users  
-                ```
-                @implicitNotFound(msg =
-                "Cannot construct a collection of type ${To} with elements of type ${Elem}" +
-                " based on a collection of type ${From}.")              
-                ```
+    * working around limitations due to type erasure
+        ```
+        object M { // compile time error - type erasure
+            def m(seq: Seq[Int]): Unit = ...
+            def m(seq: Seq[String]): Unit = ...
+        }
+        
+        object M { // OK
+            implicit object IntMarker
+            implicit object StringMarker
+        
+            def m(seq: Seq[Int])(implicit i: IntMarker.type): Unit = ...
+        
+            def m(seq: Seq[String])(implicit s: StringMarker.type): Unit = ...
+        }
+        ```
+    * constraints reducing bugs
+        * example: limit the allowed types that can be used with certain methods with parameterized types
 
 ## conversions
 ```
