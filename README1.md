@@ -12,7 +12,6 @@
     * they are "nonlocal" in the source code - it’s not obvious when an implicit value or method 
       is being used, which can be confusing to the reader
 * some are imported automatically through `Predef`
-    * most of those are used to convert from one type to another
 * used to 
     * reduce boilerplate
     * simulate adding new methods to existing types
@@ -32,7 +31,11 @@ def anotherMethod() {
       from the enclosing scope, if available
     * otherwise, a compiler error occurs 
     * only the last argument can be implicit
-    
+* compiler searches for candidate instances in the implicit scope at the call site, which roughly consists of:
+    * local or inherited definitions
+    * imported definitions
+    * definitions in the companion object of the type class or the parameter type
+
 ## methods
 ```
 case class Data(...)
@@ -90,6 +93,13 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
 
 ## implicitly
 * `Predef` defines a method called implicitly
+    * `def implicitly[A](implicit value: A): A = value`
+* summons any value from implicit scope
+    ```
+    import JsonWriterInstances._
+  
+    val jw = implicitly[JsonWriter[String]]
+    ```
 * syntactic sugar fo defining implicit parameterized argument
     ```
     // idiom is so common that Scala provides a shorthand syntax
@@ -155,8 +165,75 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
 * instances of a type class provide implementations for the types
     * we define instances by creating concrete implementations of the type class and tagging 
       them with the implicit keyword
-* note that Java’s default toString is of little value, because it just shows the type
-  name and its address in the JVM’s heap
+    ```
+    object JsonWriterInstances {
+        implicit val stringWriter: JsonWriter[String] = (value: String) => JsString(value) // single abstract method
+        implicit val personWriter: JsonWriter[Person] = // creating anonymous class explicitly
+            new JsonWriter[Person] {
+                def write(value: Person): Json =
+                    JsObject(Map(
+                        "name" -> JsString(value.name),
+                        "email" -> JsString(value.email)
+                    ))
+        }
+        // etc...
+    }
+    ```
+    * two common ways of specifying an interface
+        * Interface Objects
+            ```
+            object Json {
+                def toJson[A](value: A)(implicit w: JsonWriter[A]): Json =
+                    w.write(value)
+            }
+            ```
+            and then
+            ```
+            import JsonWriterInstances._ // import any type class instances we care about
+            
+            Json.toJson(Person("Dave", "dave@example.com") // Json.toJson(Person("Dave", "dave@example.com"))(personWriter)
+            ```
+        * Interface Syntax
+            ```
+            object JsonSyntax {
+                implicit class JsonWriterOps[A](value: A) { // extension methods to extend existing types with interface methods
+                    def toJson(implicit w: JsonWriter[A]): Json =
+                        w.write(value)
+                }
+            }
+            ```
+            and then
+            ```
+            import JsonWriterInstances._
+            import JsonSyntax._
+          
+            Person("Dave", "dave@example.com").toJson // Person("Dave", "dave@example.com").toJson(personWriter)
+            ```
+
+## recursive resolution
+* consider `JsonWriter[Option[A]]`
+* we need instance for every `A`
+    ```
+    implicit val optionIntWriter: JsonWriter[Option[Int]] =
+    ???
+    implicit val optionPersonWriter: JsonWriter[Option[Person]] =
+    ???
+    // and so on...
+    ```
+    * it doesn't scale
+* we can abstract the code for handling `Option[A]` into a common constructor based on the instance for `A`
+    ```
+    implicit def optionWriter[A](implicit writer: JsonWriter[A]): JsonWriter[Option[A]] = 
+        option: Option[A] => option match {
+            case Some(aValue) => writer.write(aValue)
+            case None => JsNull
+        }
+    ```
+    then
+    ```
+    Json.toJson(Option("A string")) // Json.toJson(Option("A string"))(optionWriter(stringWriter))
+    ```
+
   
 ## performance
 * compile-time overhead: project is slow to build
