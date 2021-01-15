@@ -4,13 +4,15 @@
     * [Scala with Cats Book - Noel Welsh](https://underscore.io/books/scala-with-cats/)
     * https://blog.knoldus.com/sorting-in-scala-using-sortedsortby-and-sortwith-function/
     * https://stackoverflow.com/questions/36432376/implicit-class-vs-implicit-conversion-to-trait
+    * https://typelevel.org/cats/
     
 ## preface
 
 ## introduction
 * implicits are a powerful, if controversial feature in Scala
-    * they are "nonlocal" in the source code - it’s not obvious when an implicit value or method 
-      is being used, which can be confusing to the reader
+    * they are "nonlocal" in the source code
+        * it’s not obvious when an implicit value or method  is being used, which can be 
+          confusing to the reader
 * some are imported automatically through `Predef`
 * used to 
     * reduce boilerplate
@@ -26,12 +28,12 @@ def anotherMethod() {
     val value = method(...) // implicit value in the local scope will be used as a context
 }
 ```
+* only the last arguments can be implicit
 * user does not have to provide argument explicitly
     * when an implicit argument is omitted, a type-compatible `implicit` value will be used 
       from the enclosing scope, if available
-    * otherwise, a compiler error occurs 
-    * only the last argument can be implicit
-* compiler searches for candidate instances in the implicit scope at the call site, which roughly consists of:
+        * otherwise, a compiler error occurs 
+* compiler searches for candidate instances in the implicit scope at the call site:
     * local or inherited definitions
     * imported definitions
     * definitions in the companion object of the type class or the parameter type
@@ -41,12 +43,13 @@ def anotherMethod() {
 case class Data(...)
 
 object DataOps {
-    implicit def op(implicit data: Data): Type2 = ...
+    implicit def op(implicit data: Data): Type2 = ... // implicit function takes only implicit arguments
 }
 
 class SomeClass {
-    import DataOps.op
-    implicit val data = Data(...)
+    import DataOps.op // imports implicit method to the scope
+    
+    implicit val data = Data(...) // to be used as implicit value 
     
     def method(arg1: Type1)(implicit context: Type2) = ...
     
@@ -56,7 +59,7 @@ class SomeClass {
 }
 
 ```
-* implicit function takes only implicit arguments
+* aren’t chained to get from the available type, through intermediate types, to the target type
 
 ## classes
 ```
@@ -73,15 +76,14 @@ class RichInt(n: Int) extends Ordered[Int] {
 }
 implicit final def RichInt(n: Int): RichInt = new RichInt(n)
 ```
-* implicit classes came into being to ease the creation of classes which provide extension methods to another type
-* conversions context
-    * implicit methods aren’t chained to get from the available type, through intermediate types, to the target type
-        * only a method that takes a single available type instance and returns a target type instance will be considered
+* ease the creation of classes which provide extension methods or conversions to another type
 * example
     ```
     implicit final class ArrowAssoc[A](val self: A) {
         def -> [B](y: B): Tuple2[A, B] = Tuple2(self, y)
     }
+  
+    Map(1 -> 2)
     ```
     * when we call `"a" -> 1`compiler goes through the following logical steps:
         1. sees a call `->` method on `String`
@@ -102,11 +104,10 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     ```
 * syntactic sugar fo defining implicit parameterized argument
     ```
-    // idiom is so common that Scala provides a shorthand syntax
     def sortBy[B](f: A => B)(implicit ord: Ordering[B]): List[A] =
         list.sortBy(f)(ord)
     ```
-    is equivalent to      
+    idiom is so common that Scala provides a shorthand syntax 
     ```
     def sortBy[B : Ordering](f: A => B): List[A] = // 'B : Ordering' is called a context bound
         list.sortBy(f)(implicitly[Ordering[B]]) // way of obtaining implicit parameter parameter
@@ -127,11 +128,10 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
                 ...
             }
             ```
-            * `<:<(A, (T, U))` equivalent to `A <:< (T, U)`
-            * `A <:< B` means A must be a subtype of B
+            * `A <:< B` means `A` must be a subtype of `B`
+                * `<:<(A, (T, U))` equivalent to `A <:< (T, U)`
             * we only used existence of implicit as confirmation that we operate on a sequence of pairs
                 * no sense in calling `toMap` if the sequence is not a sequence of pairs
-        * example: limit the allowed types that can be used with certain methods with parameterized types
     * working around limitations due to type erasure
         ```
         object M { // compile time error - type erasure
@@ -148,11 +148,12 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
             def m(seq: Seq[String])(implicit s: StringMarker.type): Unit = ...
         }
         ```
-    * constraints reducing bugs
-        * example: limit the allowed types that can be used with certain methods with parameterized types
 
 ## cats
-
+* provides abstractions for functional programming in the Scala
+* name is a playful shortening of the word category
+* goal: provide a foundation for an ecosystem of pure, typeful libraries to support functional programming 
+  in Scala applications
 
 ## type classes
 * is an interface or API that represents some functionality we want to implement
@@ -163,8 +164,7 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     }
     ```
 * instances of a type class provide implementations for the types
-    * we define instances by creating concrete implementations of the type class and tagging 
-      them with the implicit keyword
+    * concrete implementations + implicit tag
     ```
     object JsonWriterInstances {
         implicit val stringWriter: JsonWriter[String] = (value: String) => JsString(value) // single abstract method
@@ -180,7 +180,7 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     }
     ```
     * two common ways of specifying an interface
-        * Interface Objects
+        * interface objects
             ```
             object Json {
                 def toJson[A](value: A)(implicit w: JsonWriter[A]): Json =
@@ -193,7 +193,7 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
             
             Json.toJson(Person("Dave", "dave@example.com") // Json.toJson(Person("Dave", "dave@example.com"))(personWriter)
             ```
-        * Interface Syntax
+        * interface syntax
             ```
             object JsonSyntax {
                 implicit class JsonWriterOps[A](value: A) { // extension methods to extend existing types with interface methods
@@ -214,10 +214,8 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
 * consider `JsonWriter[Option[A]]`
 * we need instance for every `A`
     ```
-    implicit val optionIntWriter: JsonWriter[Option[Int]] =
-    ???
-    implicit val optionPersonWriter: JsonWriter[Option[Person]] =
-    ???
+    implicit val optionIntWriter: JsonWriter[Option[Int]] = ???
+    implicit val optionPersonWriter: JsonWriter[Option[Person]] = ???
     // and so on...
     ```
     * it doesn't scale
@@ -234,7 +232,6 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     Json.toJson(Option("A string")) // Json.toJson(Option("A string"))(optionWriter(stringWriter))
     ```
 
-  
 ## performance
 * compile-time overhead: project is slow to build
 * runtime overhead: due to the extra layers of indirection from the wrapper types
