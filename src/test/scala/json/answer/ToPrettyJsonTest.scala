@@ -2,6 +2,7 @@ package json.answer
 
 import json.answer.ToPrettyJsonInstances._
 import json.answer.ToPrettyJsonSyntax._
+import json.common.{Address, Person}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class ToPrettyJsonTest extends org.scalatest.FunSuite {

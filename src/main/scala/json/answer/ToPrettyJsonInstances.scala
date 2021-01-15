@@ -1,6 +1,7 @@
 package json.answer
 
 import json.answer.ToPrettyJsonSyntax._
+import json.common.{Address, Person}
 
 object ToPrettyJsonInstances {
 

@@ -2,6 +2,7 @@ package evidence.answer
 
 import evidence.answer.ListSyntax._
 import evidence.answer.MonoidInstances._
+import evidence.common.Order
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class OrderTest extends org.scalatest.FunSuite {

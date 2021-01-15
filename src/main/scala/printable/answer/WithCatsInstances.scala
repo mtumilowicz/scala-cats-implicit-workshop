@@ -1,10 +1,11 @@
 package printable.answer
 
 import cats.Show
+import printable.common.Car
 
 object WithCatsInstances {
 
-  implicit val personShow: Show[Person] =
-    Show.show(person => s"${person.name} is a ${person.age} year-old")
+  implicit val carShow: Show[Car] =
+    Show.show(car => s"this ${car.name} is a ${car.age} years old")
 
 }

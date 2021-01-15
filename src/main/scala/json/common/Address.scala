@@ -1,3 +1,3 @@
-package json.answer
+package json.common
 
 case class Address(street: String, city: String)

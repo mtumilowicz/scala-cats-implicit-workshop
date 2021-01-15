@@ -1,6 +1,7 @@
 package evidence.answer
 
 import cats.Monoid
+import evidence.common.Order
 
 object MonoidInstances {
 
