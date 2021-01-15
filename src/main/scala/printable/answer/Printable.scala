@@ -8,7 +8,7 @@ trait Printable[A] {
 
 object Printable {
 
-  def format[A](a: A)(implicit printable: Printable[A]): String = printable.format(a)
-
   def print[A](a: A)(implicit printable: Printable[A]): Unit = Predef.print(format(a))
+
+  def format[A](a: A)(implicit printable: Printable[A]): String = printable.format(a)
 }

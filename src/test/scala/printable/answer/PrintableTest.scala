@@ -1,10 +1,10 @@
 package printable.answer
 
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import PrintableInstances._
-import PrintableSyntax._
-import WithCatsInstances._
 import cats.implicits._
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import printable.answer.PrintableInstances._
+import printable.answer.PrintableSyntax._
+import printable.answer.WithCatsInstances._
 
 import java.io.ByteArrayOutputStream
 
