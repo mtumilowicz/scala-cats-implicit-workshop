@@ -1,4 +1,4 @@
-package printable
+package printable.answer
 
 object PrintableSyntax {
 

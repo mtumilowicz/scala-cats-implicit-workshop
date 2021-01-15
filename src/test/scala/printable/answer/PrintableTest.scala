@@ -1,4 +1,4 @@
-package printable
+package printable.answer
 
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import PrintableInstances._

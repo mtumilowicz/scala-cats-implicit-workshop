@@ -1,6 +1,6 @@
-package printable
+package printable.answer
 
-import cats._
+import cats.Show
 
 object WithCatsInstances {
 

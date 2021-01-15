@@ -1,4 +1,4 @@
-package evidence
+package evidence.answer
 
 import cats.Monoid
 import cats.implicits.catsSyntaxSemigroup

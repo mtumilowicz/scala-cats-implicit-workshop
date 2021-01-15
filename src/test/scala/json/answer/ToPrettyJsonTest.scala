@@ -1,7 +1,8 @@
-package json
+package json.answer
 
-import json.ToPrettyJsonInstances._
-import json.ToPrettyJsonSyntax._
+import ToPrettyJsonInstances._
+import ToPrettyJsonSyntax._
+import json.answer.Person
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class ToPrettyJsonTest extends org.scalatest.FunSuite {

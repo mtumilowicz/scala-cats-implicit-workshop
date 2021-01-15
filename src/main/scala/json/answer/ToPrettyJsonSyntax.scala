@@ -1,4 +1,4 @@
-package json
+package json.answer
 
 object ToPrettyJsonSyntax {
 

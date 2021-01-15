@@ -1,6 +1,6 @@
-package json
+package json.answer
 
-import json.ToPrettyJsonSyntax._
+import json.answer.ToPrettyJsonSyntax._
 
 object ToPrettyJsonInstances {
 

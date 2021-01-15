@@ -1,7 +1,7 @@
-package evidence
+package evidence.answer
 
-import evidence.ListSyntax._
-import evidence.MonoidInstances._
+import ListSyntax._
+import MonoidInstances._
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class OrderTest extends org.scalatest.FunSuite {
