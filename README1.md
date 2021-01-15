@@ -7,6 +7,11 @@
     * https://typelevel.org/cats/
     
 ## preface
+* goals of this workshop:
+    * introduction to implicits
+    * practicing basic use-cases of implicits
+    * basics of cats  
+workshop: `workshop` package, answers: `answers` package
 
 ## introduction
 * implicits are a powerful, if controversial feature in Scala
