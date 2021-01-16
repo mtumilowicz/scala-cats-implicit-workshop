@@ -1,15 +1,17 @@
-package printable.answer
+package printable.workshop
 
 import cats.implicits._
+import org.scalatest.Ignore
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import printable.answer.PrintableInstances._
-import printable.answer.PrintableSyntax._
-import printable.answer.WithCatsInstances._
+import printable.workshop.PrintableInstancesWorkshop._
+import printable.workshop.PrintableSyntaxWorkshop._
+import printable.workshop.WithCatsInstancesWorkshop._
 import printable.common.Car
 
 import java.io.ByteArrayOutputStream
 
-class PrintableTest extends org.scalatest.FunSuite {
+@Ignore
+class PrintableWorkshopTest extends org.scalatest.FunSuite {
 
   test("extension method: format") {
     //    given
@@ -46,7 +48,7 @@ class PrintableTest extends org.scalatest.FunSuite {
     val car = Car(name = "ford", age = 33)
 
     //    expect
-    Printable.format(car) shouldBe "this ford is 33 years old"
+    PrintableWorkshop.format(car) shouldBe "this ford is 33 years old"
   }
 
   test("companion object method: print") {
@@ -56,7 +58,7 @@ class PrintableTest extends org.scalatest.FunSuite {
     //    when
     val outCapture = new ByteArrayOutputStream
     Console.withOut(outCapture) {
-      Printable.print(car)
+      PrintableWorkshop.print(car)
     }
 
     // then

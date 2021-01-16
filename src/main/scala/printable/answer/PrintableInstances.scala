@@ -7,5 +7,5 @@ object PrintableInstances {
 
   implicit val printableInt: Printable[Int] = (a: Int) => a.toString
 
-  implicit val printableCat: Printable[Car] = (a: Car) => s"this ${a.name} is a ${a.age} years old"
+  implicit val printableCat: Printable[Car] = (a: Car) => s"this ${a.name} is ${a.age} years old"
 }
