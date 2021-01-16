@@ -6,6 +6,6 @@ import printable.common.Car
 object WithCatsInstances {
 
   implicit val carShow: Show[Car] =
-    Show.show(car => s"this ${car.name} is a ${car.age} years old")
+    Show.show(car => s"this ${car.name} is ${car.age} years old")
 
 }
