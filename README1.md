@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/mtumilowicz/scala-cats-implicit-workshop.svg?branch=master)](https://travis-ci.com/mtumilowicz/scala-cats-implicit-workshop)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 # scala-cats-implicit-workshop
 * references
     * [Programming Scala, 2nd Edition - Dean Wampler](https://www.oreilly.com/library/view/programming-scala-2nd/9781491950135/)
