@@ -199,7 +199,7 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
             ```
             import JsonWriterInstances._ // import any type class instances we care about
             
-            Json.toJson(Person("Dave", "dave@example.com") // Json.toJson(Person("Dave", "dave@example.com"))(personWriter)
+            Json.toJson(Person("Dave", "dave@example.com")) // Json.toJson(Person("Dave", "dave@example.com"))(personWriter)
             ```
         * interface syntax
             ```
