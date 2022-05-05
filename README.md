@@ -8,6 +8,7 @@
     * https://blog.knoldus.com/sorting-in-scala-using-sortedsortby-and-sortwith-function/
     * https://stackoverflow.com/questions/36432376/implicit-class-vs-implicit-conversion-to-trait
     * https://typelevel.org/cats/
+    * [Zymposium — Explaining Implicits (Scala 2)](https://www.youtube.com/watch?v=83rm2LxdkAQ)
     
 ## preface
 * goals of this workshop:
@@ -138,6 +139,8 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
             ```
             * `A <:< B` means `A` must be a subtype of `B`
                 * `<:<(A, (T, U))` equivalent to `A <:< (T, U)`
+                * `sealed abstract class <:<[-From, +To] extends (From => To) with Serializable`
+                  * extends Function
             * we only used existence of implicit as confirmation that we operate on a sequence of pairs
                 * no sense in calling `toMap` if the sequence is not a sequence of pairs
     * working around limitations due to type erasure
