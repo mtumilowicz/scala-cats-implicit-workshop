@@ -9,6 +9,7 @@
     * https://stackoverflow.com/questions/36432376/implicit-class-vs-implicit-conversion-to-trait
     * https://typelevel.org/cats/
     * [Zymposium — Explaining Implicits (Scala 2)](https://www.youtube.com/watch?v=83rm2LxdkAQ)
+    * [Zymposium - ZIO API Design Techniques](https://www.youtube.com/watch?v=48fpPffgnMo)
     
 ## preface
 * goals of this workshop:
@@ -137,12 +138,58 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
                 ...
             }
             ```
+            * we only used existence of implicit as confirmation that we operate on a sequence of pairs
+                * no sense in calling `toMap` if the sequence is not a sequence of pairs
             * `A <:< B` means `A` must be a subtype of `B`
                 * `<:<(A, (T, U))` equivalent to `A <:< (T, U)`
                 * `sealed abstract class <:<[-From, +To] extends (From => To) with Serializable`
-                  * extends Function
-            * we only used existence of implicit as confirmation that we operate on a sequence of pairs
-                * no sense in calling `toMap` if the sequence is not a sequence of pairs
+                    * so we can use evidence as a function
+                        ```
+                        case class Effect[+E, +A](value: Either[E, A]) {
+                            def some[B](implicit ev: A <:< Option[B]): Effect[Option[E], B] =
+                                value.fold(
+                                    e => Effect.fail(Some(e)),
+                                    a => ev(a).fold[Effect[Option[E], B]](Effect.fail(Option.empty[E]))(Effect.success))
+                        }
+                      
+                        object Effect {
+                            def fail[E](error: => E): Effect[E, Nothing] =
+                                Effect(Left(error))
+                          
+                            def success[A](a: A): Effect[Nothing, A] =
+                                Effect(Right(a))
+                        }
+                        ```
+                        and then
+                        ```
+                        val a: Effect[Throwable, Option[Int]] = Effect(Right(Option(1)))
+                        val b: Effect[Option[Throwable], Int] = a.some // a.some(refl)
+                        // turn on show implicit hints (intellij) to see that it is using refl
+                        // implicit def refl[A]: A =:= A = singleton.asInstanceOf[A =:= A]
+                        // A =:= B means A must be exactly B
+                        ```
+                        however
+                        ```
+                        val a: Effect[Throwable, Int] = Effect(Right(1))
+                        val b: Effect[Option[Throwable], Int] = a.some // not compiling: Cannot prove that Int <:< Option[Int]
+                        ```
+                        to customize errors we can code "alias" of `<:<`
+                        ```
+                        case class Effect[+E, +A](value: Either[E, A]) {
+                            def some[B](implicit ev: A IsSubtypeOf Option[B]): Effect[Option[E], B] = // modify <:< to IsSubtypeOf
+                        
+                        @implicitNotFound("\nThis operator requires that the output type be a subtype of ${B}\nBut the actual type was ${A}.") // we can style compilation error
+                        trait IsSubtypeOf[-A, +B] extends (A => B)
+                      
+                        object IsSubtypeOf {
+                            implicit def same[A]: IsSubtypeOf[A, A] = (sub: A) => sub
+                        }
+                        ```
+                        then we can verify that evidence from `IsSubtypeOf` is used
+                        ```
+                        val a: Effect[Throwable, Option[Int]] = Effect(Right[Throwable, Option[Int]](Option(1)))
+                        val b = a.some(same) // after turning on show implicit hints (intellij)
+                        ```
     * working around limitations due to type erasure
         ```
         object M { // compile time error - type erasure
