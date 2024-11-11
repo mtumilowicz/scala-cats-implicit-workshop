@@ -10,6 +10,7 @@
     * https://typelevel.org/cats/
     * [Zymposium — Explaining Implicits (Scala 2)](https://www.youtube.com/watch?v=83rm2LxdkAQ)
     * [Zymposium - ZIO API Design Techniques](https://www.youtube.com/watch?v=48fpPffgnMo)
+    * [Scala Implicits Revisited • Martin Odersky • YOW! 2020](https://www.youtube.com/watch?v=dr0PUXQhg3M)
     
 ## preface
 * goals of this workshop:
@@ -122,6 +123,9 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     def sortBy[B : Ordering](f: A => B): List[A] = // 'B : Ordering' is called a context bound
         list.sortBy(f)(implicitly[Ordering[B]]) // way of obtaining implicit parameter parameter
     ```
+
+## design mistakes
+
 
 ## case study
 * common idioms
