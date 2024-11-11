@@ -125,7 +125,50 @@ implicit final def RichInt(n: Int): RichInt = new RichInt(n)
     ```
 
 ## design mistakes
-
+1. depending on names
+    * names matter, where they shouldn't
+    * shadowing is a problem
+        ```
+        implicit val a: TC = ...
+        def f(a: A) =
+          ... implicitly[TC] ... // does not work, a is shadowed
+        ```
+1. nesting does not matter
+    ```
+    implicit val a: TC = ...
+    def f(implicit ev: TC) =
+      ... implicitly[TC] ... // does not work, gives an ambiguity: a, ev
+    ```
+    leads to problems with local coherence
+    ```
+    trait Functor[F[_]]
+    trait Monad[F[_]] extends Functor[F]
+    trait Traverse[F[_]] extends Functor[F]
+    def map[A, B, F[_]: Functor](x: F[A], f: A => B): F[B] = ???
+    def f[A, B, F[_]: Monad: Traverse](x: F[A], f: A => B): F[B] =
+      map(x, f) // error: ambiguous - should get "map" instance from Monad or Traverse?
+    ```
+    adding it implicitly does not work - it brings even more ambiguity
+    ```
+    trait Functor[F[_]]
+    trait Monad[F[_]] extends Functor[F]
+    trait Traverse[F[_]] extends Functor[F]
+    def map[A, B, F[_]: Functor](x: F[A], f: A => B): F[B] = ???
+    def f[A, B, F[_]: Monad: Traverse](x: F[A], f: A => B): F[B] =
+      implicit val ev: Functor[F] = implicitly[Monad[F]] // makes it even worse: brings more ambiguity
+      map(x, f) // error: ambiguous - nesting does not matter
+    ```
+1. similar syntax for different concepts
+    * implicit conversions and instances look almost the same but are completely different concepts
+    * conversion: `implicit def a(x: T): U` vs conditional: `implicit def a(implicit x: T): U`
+1. implicit parameters are too close to normal ones
+    * applications of implicit functions are like normal applications
+    * impliciteness is a leaky abstraction
+        ```
+        def f(implicit ev: T): U => V
+        f(u) // type error
+        f.apply(u) // OK
+        ```
 
 ## case study
 * common idioms
